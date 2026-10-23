@@ -1,15 +1,7 @@
 <template>
   <div class="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-12 sm:py-16">
-    <header class="flex items-end justify-between">
-      <div>
-        <h1 class="text-3xl font-bold tracking-tight text-slate-900">
-          Tasks
-        </h1>
-        <p id="summary" class="mt-1 text-sm text-slate-500">
-          {{ remaining }} of {{ tasks.length }}
-        </p>
-      </div>
-    </header>
+
+    <TaskHeader />
 
     <div id="task-form"
       class="flex flex-col gap-2 rounded-2xl bg-white p-2 shadow-sm ring-1 ring-slate-200 transition focus-within:ring-2 focus-within:ring-slate-900">
@@ -85,7 +77,18 @@
   </div>
 </template>
 <script>
+import TaskHeader from '@/components/TaskHeader.vue'
+
 export default {
+  components: {
+    TaskHeader
+  },
+  created() {
+    const savedTasks = localStorage.getItem('tasks');
+    if (savedTasks) {
+      this.tasks = JSON.parse(savedTasks);
+    }
+  },
   data() {
     return {
       currentFilter: 'all',
@@ -113,6 +116,9 @@ export default {
     },
   },
   methods: {
+    saveTasks() {
+      localStorage.setItem('tasks', JSON.stringify(this.tasks));
+    },
     updateFilter(filter) {
       this.currentFilter = filter;
     },
@@ -128,9 +134,11 @@ export default {
         done: false,
       });
       this.task = '';
+      this.saveTasks();
     },
     deleteTask(index) {
       this.tasks.splice(index, 1);
+      this.saveTasks();
     },
     markEditing(index) {
       this.tasks[index].isEditing = !this.tasks[index].isEditing;
